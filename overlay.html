@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>IsleSurvivors Overlay</title>
 
   <!-- Twitch Extension Helper -->
@@ -16,33 +16,74 @@
       font-family: Arial, sans-serif;
     }
 
-    #panel {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      background: rgba(0,0,0,0.75);
+    #playerName {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       color: white;
-      padding: 12px 16px;
-      border-radius: 8px;
+      font-size: 32px;
+      font-weight: bold;
+      background: rgba(0,0,0,0.6);
+      padding: 12px 20px;
+      border-radius: 10px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    #simulateBtn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 10px 16px;
       font-size: 14px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-  <div id="panel">
-    IsleSurvivors<br>
-    Overlay cargado
-  </div>
+  <div id="playerName">Jugador</div>
+  <!-- Botón de prueba local -->
+  <button id="simulateBtn">Simular !jugar</button>
 
   <script>
-    // Inicialización básica de la extensión
-    window.Twitch.ext.onAuthorized(function(auth) {
-      console.log("Ext autorizada", auth);
-      document.getElementById("panel").innerHTML =
-        "IsleSurvivors<br>Usuario autorizado";
-    });
-  </script>
+    const playerName = document.getElementById('playerName');
+    const simulateBtn = document.getElementById('simulateBtn');
 
+    function showPlayer(name) {
+      playerName.textContent = name;
+      playerName.style.opacity = '1';
+      clearTimeout(window.hideTimer);
+      window.hideTimer = setTimeout(() => {
+        playerName.style.opacity = '0';
+      }, 4000);
+    }
+
+    // --- Botón local de prueba ---
+    simulateBtn.addEventListener('click', () => {
+      const testName = "Viewer_" + Math.floor(Math.random() * 1000);
+      showPlayer(testName);
+    });
+
+    // --- Twitch Extension API ---
+    window.Twitch.ext.onAuthorized(auth => {
+      console.log("Ext autorizada", auth);
+
+      // Suscribirse a PubSub para recibir mensajes desde tu backend
+      // El backend debe enviar los nombres de viewers que escriban !jugar
+      window.Twitch.ext.listen('broadcast', (target, contentType, message) => {
+        try {
+          const data = JSON.parse(message);
+          if(data.type === "jugar" && data.username) {
+            showPlayer(data.username);
+          }
+        } catch(e) {
+          console.error("Error parseando mensaje:", e);
+        }
+      });
+    });
+
+  </script>
 </body>
 </html>

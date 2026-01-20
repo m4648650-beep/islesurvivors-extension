@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>IsleSurvivors Overlay</title>
 
   <!-- Twitch Extension Helper -->
@@ -16,74 +16,87 @@
       font-family: Arial, sans-serif;
     }
 
+    #panel {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: rgba(0,0,0,0.75);
+      color: white;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
     #playerName {
-      position: absolute;
+      position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      color: white;
-      font-size: 32px;
+      font-size: 28px;
       font-weight: bold;
-      background: rgba(0,0,0,0.6);
-      padding: 12px 20px;
-      border-radius: 10px;
+      color: yellow;
+      text-shadow: 1px 1px 3px black;
       opacity: 0;
-      transition: opacity 0.3s;
+      transition: opacity 0.5s;
     }
 
-    #simulateBtn {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      padding: 10px 16px;
+    button {
+      margin-top: 10px;
+      padding: 6px 12px;
       font-size: 14px;
+      border-radius: 5px;
+      border: none;
       cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-  <div id="playerName">Jugador</div>
-  <!-- Botón de prueba local -->
-  <button id="simulateBtn">Simular !jugar</button>
+  <div id="panel">
+    IsleSurvivors Overlay
+    <br>
+    <button id="simulate">Simular !jugar</button>
+  </div>
+
+  <div id="playerName"></div>
 
   <script>
     const playerName = document.getElementById('playerName');
-    const simulateBtn = document.getElementById('simulateBtn');
+    const simulateBtn = document.getElementById('simulate');
 
+    // Mostrar jugador en pantalla
     function showPlayer(name) {
       playerName.textContent = name;
       playerName.style.opacity = '1';
       clearTimeout(window.hideTimer);
       window.hideTimer = setTimeout(() => {
         playerName.style.opacity = '0';
-      }, 4000);
+      }, 5000);
     }
 
-    // --- Botón local de prueba ---
+    // Botón para simular !jugar
     simulateBtn.addEventListener('click', () => {
-      const testName = "Viewer_" + Math.floor(Math.random() * 1000);
-      showPlayer(testName);
+      showPlayer("JugadorSimulado");
     });
 
-    // --- Twitch Extension API ---
-    window.Twitch.ext.onAuthorized(auth => {
+    // --- Twitch Extension Chat ---
+    window.Twitch.ext.onAuthorized((auth) => {
       console.log("Ext autorizada", auth);
 
-      // Suscribirse a PubSub para recibir mensajes desde tu backend
-      // El backend debe enviar los nombres de viewers que escriban !jugar
+      // Conexión para escuchar PubSub o chat real (con extensiones se hace via onPubSub)
       window.Twitch.ext.listen('broadcast', (target, contentType, message) => {
         try {
           const data = JSON.parse(message);
-          if(data.type === "jugar" && data.username) {
-            showPlayer(data.username);
+          if (data.type === "jugar") {
+            showPlayer(data.user);
           }
-        } catch(e) {
-          console.error("Error parseando mensaje:", e);
-        }
+        } catch(e) { console.log(e); }
       });
     });
 
+    // --- Para pruebas locales sin Twitch ---
+    // Llamada directa: window.Twitch.ext.send("broadcast", JSON.stringify({type:"jugar", user:"ViewerX"}))
   </script>
+
 </body>
 </html>

@@ -1,94 +1,48 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>IsleSurvivors Chat Bot2</title>
-  <style>
-    #game {
-      width: 400px; 
-      height: 400px;
-      background: lightgrey;
-      position: relative;
-      margin-top: 20px;
-    }
-    #player {
-      width: 20px; 
-      height: 20px;
-      background: red;
-      position: absolute;
-      top: 190px; 
-      left: 190px;
-    }
-    #log {
-      margin-top: 10px;
-      height: 150px;
-      overflow-y: auto;
-      border: 1px solid #ccc;
-      padding: 5px;
-      font-family: monospace;
-      background: #f5f5f5;
-    }
-  </style>
-
-  <!-- tmi.js desde CDN confiable -->
-  <script src="https://cdn.jsdelivr.net/npm/tmi.js@1.8.5/dist/tmi.min.js"></script>
+<meta charset="UTF-8">
+<title>IsleSurvivors Chat Bot</title>
+<style>
+  #game { width:400px;height:400px;background:lightgrey;position:relative;margin-top:20px; }
+  #player { width:20px;height:20px;background:red;position:absolute;top:190px;left:190px; }
+  #log { margin-top:10px;height:150px;overflow-y:auto;border:1px solid #ccc;padding:5px;font-family:monospace;background:#f5f5f5; }
+</style>
 </head>
 <body>
-
-<h2>IsleSurvivors Chat Bot2</h2>
-
-<div id="game">
-  <div id="player"></div>
-</div>
-
+<h2>IsleSurvivors Chat Bot</h2>
+<div id="game"><div id="player"></div></div>
 <div id="log"></div>
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
+<!-- tmi.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/tmi.js@1.8.5/dist/tmi.min.js" defer></script>
 
-  // --- Configuración del cliente Twitch ---
+<script defer>
+document.addEventListener("DOMContentLoaded", () => {
   const client = new tmi.Client({
-    identity: {
-      username: 'islesurvivors',                  // tu usuario de Twitch
-      password: 'oauth:hj9uvvm431my7xqscvz9e5p39ifoi8' // token OAuth
-    },
-    channels: [ 'islesurvivors' ]                // canal a leer
+    identity: { username: 'islesurvivors', password: 'oauth:hj9uvvm431my7xqscvz9e5p39ifoi8' },
+    channels: ['islesurvivors']
   });
 
-  client.connect().then(() => {
-    console.log("Conectado a Twitch chat!");
-    log("Conectado a Twitch chat!");
-  }).catch(console.error);
+  client.connect().then(() => console.log("Conectado a Twitch!"));
 
   const player = document.getElementById("player");
-  const logDiv = document.getElementById("log");
-  let posX = 190, posY = 190;
+  let posX=190,posY=190;
 
   function moverJugador(comando) {
-    const paso = 10;
-    if(comando === "!up") posY = Math.max(0, posY - paso);
-    if(comando === "!down") posY = Math.min(380, posY + paso);
-    if(comando === "!left") posX = Math.max(0, posX - paso);
-    if(comando === "!right") posX = Math.min(380, posX + paso);
-    player.style.left = posX + "px";
-    player.style.top = posY + "px";
+    const paso=10;
+    if(comando==="!up") posY=Math.max(0,posY-paso);
+    if(comando==="!down") posY=Math.min(380,posY+paso);
+    if(comando==="!left") posX=Math.max(0,posX-paso);
+    if(comando==="!right") posX=Math.min(380,posX+paso);
+    player.style.left=posX+"px";
+    player.style.top=posY+"px";
   }
 
-  function log(texto) {
-    logDiv.innerHTML += texto + "<br>";
-    logDiv.scrollTop = logDiv.scrollHeight;
-  }
-
-  // --- Escucha mensajes ---
-  client.on('message', (channel, tags, message, self) => {
-    if(self) return; // ignorar mensajes del bot
-    if(message.startsWith("!")) {
-      moverJugador(message.trim());
-      log(tags.username + " escribió: " + message);
-      console.log(tags.username + " escribió: " + message);
-    }
+  client.on('message',(channel,tags,message,self)=>{
+    if(self) return;
+    if(message.startsWith("!")) moverJugador(message.trim());
   });
-
 });
 </script>
 

@@ -2,21 +2,21 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>IsleSurvivors Chat Bot1</title>
+  <title>IsleSurvivors Chat Bot2</title>
   <style>
     #game {
-      width: 400px;
+      width: 400px; 
       height: 400px;
       background: lightgrey;
       position: relative;
       margin-top: 20px;
     }
     #player {
-      width: 20px;
+      width: 20px; 
       height: 20px;
       background: red;
       position: absolute;
-      top: 190px;
+      top: 190px; 
       left: 190px;
     }
     #log {
@@ -30,12 +30,12 @@
     }
   </style>
 
-  <!-- Cargar tmi.js con defer para que esté disponible antes del script -->
-  <script src="https://cdn.jsdelivr.net/npm/tmi.js@1.8.5/dist/tmi.min.js" defer></script>
+  <!-- tmi.js desde CDN confiable -->
+  <script src="https://cdn.jsdelivr.net/npm/tmi.js@1.8.5/dist/tmi.min.js"></script>
 </head>
 <body>
 
-<h2>IsleSurvivors Chat Bot1</h2>
+<h2>IsleSurvivors Chat Bot2</h2>
 
 <div id="game">
   <div id="player"></div>
@@ -43,21 +43,22 @@
 
 <div id="log"></div>
 
-<script defer>
+<script>
 document.addEventListener("DOMContentLoaded", () => {
 
   // --- Configuración del cliente Twitch ---
   const client = new tmi.Client({
     identity: {
-      username: 'islesurvivors',               // tu usuario de Twitch
-      password: 'oauth:hj9uvvm431my7xqscvz9e5p39ifoi8' // tu token OAuth
+      username: 'islesurvivors',                  // tu usuario de Twitch
+      password: 'oauth:hj9uvvm431my7xqscvz9e5p39ifoi8' // token OAuth
     },
-    channels: ['islesurvivors']               // canal al que conectarse
+    channels: [ 'islesurvivors' ]                // canal a leer
   });
 
-  client.connect()
-    .then(() => log("Conectado al chat de Twitch!"))
-    .catch(err => log("Error al conectar: " + err));
+  client.connect().then(() => {
+    console.log("Conectado a Twitch chat!");
+    log("Conectado a Twitch chat!");
+  }).catch(console.error);
 
   const player = document.getElementById("player");
   const logDiv = document.getElementById("log");
@@ -76,15 +77,15 @@ document.addEventListener("DOMContentLoaded", () => {
   function log(texto) {
     logDiv.innerHTML += texto + "<br>";
     logDiv.scrollTop = logDiv.scrollHeight;
-    console.log(texto);
   }
 
-  // --- Escuchar mensajes del chat ---
+  // --- Escucha mensajes ---
   client.on('message', (channel, tags, message, self) => {
     if(self) return; // ignorar mensajes del bot
     if(message.startsWith("!")) {
       moverJugador(message.trim());
       log(tags.username + " escribió: " + message);
+      console.log(tags.username + " escribió: " + message);
     }
   });
 

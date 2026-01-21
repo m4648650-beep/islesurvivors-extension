@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h1>Token recibido</h1>
+<script>
+  // Extraer access_token del hash
+  const hash = window.location.hash.substr(1);
+  const params = new URLSearchParams(hash);
+  const token = params.get("access_token");
+  document.body.innerHTML += "<p>Access Token: " + token + "</p>";
+  console.log("Access Token:", token);
+</script>
+</body>
+</html>

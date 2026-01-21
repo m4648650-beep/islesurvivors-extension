@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>IsleSurvivors Chat Bot</title>
+  <style>
+    #game {
+      width: 400px; height: 400px;
+      background: lightgrey;
+      position: relative;
+    }
+    #player {
+      width: 20px; height: 20px;
+      background: red;
+      position: absolute;
+      top: 190px; left: 190px;
+    }
+  </style>
+
+  <script src="https://unpkg.com/tmi.js@1.8.5/dist/tmi.min.js"></script>
+</head>
+<body>
+
+<h2>IsleSurvivors</h2>
+<div id="game">
+  <div id="player"></div>
+</div>
+
+<script>
+  // --- Configuración del cliente Twitch ---
+  const client = new tmi.Client({
+    identity: {
+      username: 'IsleSurvivors',
+      password: 'oauth:hj9uvvm431my7xqscvz9e5p39ifoi8' // token recibido
+    },
+    channels: [ 'IsleSurvivors' ]
+  });
+
+  client.connect();
+
+  const player = document.getElementById("player");
+  let posX = 190, posY = 190;
+
+  function moverJugador(comando) {
+    const paso = 10;
+    if(comando === "!up") posY -= paso;
+    if(comando === "!down") posY += paso;
+    if(comando === "!left") posX -= paso;
+    if(comando === "!right") posX += paso;
+    player.style.left = posX + "px";
+    player.style.top = posY + "px";
+  }
+
+  // --- Escucha mensajes ---
+  client.on('message', (channel, tags, message, self) => {
+    if(self) return;
+    if(message.startsWith("!")) {
+      moverJugador(message.trim());
+      console.log(tags.username + " escribió: " + message);
+    }
+  });
+</script>
+
+</body>
+</html>
